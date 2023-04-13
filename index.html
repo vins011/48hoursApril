@@ -70,7 +70,7 @@
 		</div>
 	    <div style="align-self: center;">
 
-			<button id="submit" style="width:200px;">Send</button>
+			<button id="chatbotSubmit" style="width:200px;">Send</button>
 		</div>
 		
 	</div>
@@ -110,6 +110,7 @@
 		const chatbox = document.getElementById('chatbox');
 		const input = document.getElementById('input');
 		const submit = document.getElementById('submit');
+		const chatbotSubmit = document.getElementById('chatbotSubmit');
 		const uploadFile = document.getElementById('upload');
 		const form = document.getElementById("form");
 		const inputFile = document.getElementById("file");
@@ -188,7 +189,7 @@
 
 
 		// Event listener for the submit button
-		//submit.addEventListener('click', sendMessage);
+		chatbotSubmit.addEventListener('click', sendMessage);
 		//uploadFile.addEventListener('click', uploadAndGetSummary);
 		// Event listener for the Enter key
 		input.addEventListener('keydown', event => {

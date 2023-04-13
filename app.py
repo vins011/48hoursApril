@@ -41,7 +41,7 @@ def num_tokens_from_string (string, encoding_name):
     return num_tokens
 
 def train_data (text):
-    openai.api_key ="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"
+    openai.api_key ="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"
     token = num_tokens_from_string (text, 'cl100k_base')
     embedding = get_embedding (text)
     ts = datetime.now ()
@@ -56,7 +56,7 @@ def train_data (text):
     df1['embedding']= df1['summary'].apply(get_embedding)
 
 def prompt_lookup(text):
-    openai.api_key ="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"
+    openai.api_key ="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"
     output_path='my_csv.csv'
     df = pd.read_csv(output_path)
     df['embedding']= df['summary'].apply(get_embedding)
@@ -81,7 +81,7 @@ def getSummery():
     input_text = data['input']
     if (('hi' == input_text.lower()) or ('hello' == input_text.lower())):
         return jsonify({'result':'How can I assist you today, I am here to generate summary for your given input..'})
-    openai.api_key = "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"
+    openai.api_key = "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"
     prompt = prompt_lookup(input_text)
     response = openai.Completion.create(
     engine="text-davinci-003",
@@ -122,7 +122,7 @@ def getScript():
             print(summary)
         response = openai.ChatCompletion.create(
         model='gpt-3.5-turbo',
-        api_key = "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",
+        api_key = "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",
         messages=[{'role':'system','content':'You are good at creating bullet point summaries and have knowledge of AWS '},
         {'role':'user','content':f"Summarize the following in bullet point form:\n{summary}"}
         ]
@@ -130,14 +130,14 @@ def getScript():
     else:
         audio_file1 = open(file_path, "rb")
         response = openai.Audio.transcribe(
-        api_key = "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",
+        api_key = "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",
         model = model_id,
         file= audio_file1)
         summary = response
         print(summary)
         response = openai.ChatCompletion.create(
         model='gpt-3.5-turbo',
-        api_key = "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",
+        api_key = "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",
         messages=[{'role':'system','content':'You are good at creating bullet point summaries and have knowledge of AWS '},
         {'role':'user','content':f"Summarize the following in bullet point form:\n{summary['text']}"}
         ]
@@ -164,7 +164,7 @@ def getScriptSummary():
     #print(summary)
     response = openai.ChatCompletion.create(
     model='gpt-3.5-turbo',
-    api_key = "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",
+    api_key = "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",
     messages=[{'role':'system','content':'You are good at creating bullet point summaries and have knowledge of AWS '},
     {'role':'user','content':f"Summarize the following in bullet point form:\n{summary['text']}"}
     ]
