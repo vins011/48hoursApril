@@ -5,3 +5,5 @@ pandas
 numpy
 tiktoken
 jupyter-tabnine
+fitz
+PyMuPDF

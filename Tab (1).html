@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>UAssist</title>
+	<style>
+		#chatbox {
+			width: 400px;
+			height: 400px;
+			border: 1px solid #ccc;
+			overflow-y: scroll;
+		}
+
+		#input {
+			width: 100%;
+		}
+
+		/* Style the tab buttons */
+		.tab {
+			overflow: hidden;
+			border: 1px solid #ccc;
+			background-color: #f1f1f1;
+		}
+
+		/* Style the buttons inside the tab */
+		.tab button {
+			background-color: inherit;
+			float: left;
+			border: none;
+			outline: none;
+			cursor: pointer;
+			padding: 14px 16px;
+			transition: 0.3s;
+			font-size: 17px;
+		}
+
+		/* Change background color of buttons on hover */
+		.tab button:hover {
+			background-color: #ddd;
+		}
+
+		/* Create an active/current tablink class */
+		.tab button.active {
+			background-color: #ccc;
+		}
+
+		/* Style the tab content */
+		.tabcontent {
+			display: none;
+			padding: 6px 12px;
+			border: 1px solid #ccc;
+			border-top: none;
+		}
+	</style>
+</head>
+
+<body>
+
+	<!-- Tab buttons -->
+	<div class="tab">
+		<button class="tablinks" onclick="openTab(event, 'Tab1')" id="defaultOpen">UTalk</button>
+		<button class="tablinks" onclick="openTab(event, 'Tab2')">Train Data</button>
+	</div>
+
+	<!-- Tab content -->
+	<div id="Tab1" class="tabcontent">
+		<div id="chatbox" style="width:100%"></div>
+		<div>
+			<input id="input" type="text" style="height:100px;" placeholder="Type your message...">
+		</div>
+	    <div style="align-self: center;">
+
+			<button id="submit" style="width:200px;">Send</button>
+		</div>
+		
+	</div>
+
+	<div id="Tab2" class="tabcontent">
+		<form method="post" id="form" enctype="multipart/form-data">
+			<table>
+				<tr>
+					<td><label for="input_1">Purpose:</label></td>
+					<td><textarea id="agenda" placeholder="Type agenda discussion..."></textarea></td>
+				</tr>
+				<tr>
+					<td><label for="input_org">Organiser:</label></td>
+					<td><input type="text" id="input_org"></td>
+				</tr>
+				<tr>
+					<td><label for="input_date">Date:</label></td>
+					<td><input id="input_date" type="text"></td>
+				</tr>
+				<tr>
+					<td><label for="File">Upload your file:</label></td>
+					<td><input type="file" id="file" name="File"></td>
+				</tr>
+				<tr>
+					<td><input type="submit" id="upload" value="Upload"></td>
+				</tr>
+			</table>
+		</form>
+
+	</div>
+
+	<div id="Tab3" class="tabcontent">
+
+	</div>
+
+	<script>
+		const chatbox = document.getElementById('chatbox');
+		const input = document.getElementById('input');
+		const submit = document.getElementById('submit');
+		const uploadFile = document.getElementById('upload');
+		const form = document.getElementById("form");
+		const inputFile = document.getElementById("file");
+		const date = document.getElementById("input_date");
+		const Organiser = document.getElementById("input_org");
+		const agenda = document.getElementById("agenda");
+		const formData = new FormData();
+
+		const handleSubmit = (event) => {
+			event.preventDefault();
+            formData.append("date", date!=null? date.value:"");
+			formData.append("Organiser", Organiser.value);
+			formData.append("agenda", agenda.value);
+			for (const file of inputFile.files) {
+				formData.append("files", file);
+			}
+
+			fetch("http://localhost:5000/uploadAndTrainData", {
+				method: "post",
+				body: formData,
+			}).catch((error) => ("Something went wrong!", error));
+		};
+
+		form.addEventListener("submit", handleSubmit);
+
+		// Function to add a message to the chatbox
+		function addMessage(message, sender) {
+			const div = document.createElement('div');
+			if ('You' === sender) {
+				div.innerHTML = "<b>" + sender + "</b>: " + message;
+			} else {
+				div.innerHTML = "<span style ='color:green;'><b>" + sender + "</b></span>: " + message;
+
+			}
+			chatbox.appendChild(div);
+			chatbox.scrollTop = chatbox.scrollHeight;
+		}
+
+		// Function to send a message to the chatbot backend and display the response
+		function sendMessage() {
+			const message = input.value;
+			input.value = '';
+			addMessage(message, 'You');
+			fetch('http://localhost:5000/assist', {
+				method: 'POST',
+				body: JSON.stringify({ 'input': message }),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
+				.then(response => response.json())
+				.then(data => {
+					const chatbotResponse = data.result;
+					addMessage(chatbotResponse, 'UTalk');
+				});
+		}
+
+		function uploadAndGetSummary(formData) {
+			//const message = filePath.value;
+			//filePath.value = '';
+			addMessage(message, 'You');
+			fetch('http://localhost:5000/getSummary', {
+				method: 'POST',
+				body: JSON.stringify({ 'input': message }),
+				headers: {
+					'Content-Type': 'application/json'
+				}
+			})
+				.then(response => response.json())
+				.then(data => {
+					const chatbotResponse = data.result;
+					addMessage(chatbotResponse, 'UTalk');
+				});
+		}
+
+
+
+		// Event listener for the submit button
+		//submit.addEventListener('click', sendMessage);
+		//uploadFile.addEventListener('click', uploadAndGetSummary);
+		// Event listener for the Enter key
+		input.addEventListener('keydown', event => {
+			if (event.key === 'Enter') {
+				event.preventDefault();
+				sendMessage();
+			}
+		});
+		// Open the first tab by default
+		document.getElementById("defaultOpen").click();
+
+		function openTab(evt, tabName) {
+			// Declare all variables
+			var i, tabcontent, tablinks;
+
+			// Get all elements with class="tabcontent" and hide them
+			tabcontent = document.getElementsByClassName("tabcontent");
+			for (i = 0; i < tabcontent.length; i++) {
+				tabcontent[i].style.display = "none";
+			}
+
+			// Get all elements with class="tablinks" and remove the class "active"
+			tablinks = document.getElementsByClassName("tablinks");
+			for (i = 0; i < tablinks.length; i++) {
+				tablinks[i].className = tablinks[i].className.replace(" active", "");
+			}
+
+			// Show the current tab, and add an "active" class to the button that opened the tab
+			document.getElementById(tabName).style.display = "block";
+			evt.currentTarget.className += " active";
+		}
+	</script>
+
+</body>
+
+</html>
